@@ -1,8 +1,6 @@
 <template>
  <div class="container">
-  <div class="row">
     <button @click="createCompany" class="btn">Create Company</button>
-  </div>
 </div>
 </template>
 
