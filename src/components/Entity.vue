@@ -5,14 +5,13 @@
     <button
       class="btn btn-danger"
       v-on:click="removeCompany"
-      v-if="!getCompany.isParentCompany"
+      v-if="!company.isParentCompany"
     >Remove company</button>
-
     <ul>
-      <li v-for="individual in getIndividualsByCompanyId(companyId)" v-bind:key="individual.id">
+      <li v-for="individual in companyIndividuals" v-bind:key="individual.id">
         <Individual :individual="individual" :ref="individual.id" />
       </li>
-      <Entity v-for="cc in getCompany.childCompanies" v-bind:key="cc" :companyId="cc" :ref="cc" />
+      <Entity v-for="cc in company.childCompanies" v-bind:key="cc" :company="getCompanyById(cc)" :ref="cc" />
     </ul>
   </form>
 </template>
@@ -28,17 +27,17 @@ export default {
     Individual
   },
   props: {
-    companyId: String,
+    company: Object,
     required: true
   },
   computed: {
-    ...mapGetters("companies", ["getCompanyById"]),
+   ...mapGetters("companies", ["getCompanyById"]),
     ...mapGetters("individuals", ["getIndividualsByCompanyId"]),
     getCompany() {
-      return this.getCompanyById(this.$props.companyId);
+      return this.getCompanyById(this.$props.company.id);
     },
     companyIndividuals() {
-      return this.getIndividualsByCompanyId(this.$props.companyId);
+      return this.getIndividualsByCompanyId(this.$props.company.id);
     },
     getUid() {
       return uuid();
@@ -51,7 +50,7 @@ export default {
           isEdit: true,
           id: uuid(),
           isNew: true,
-          companyId: this.$props.companyId
+          companyId: this.$props.company.id
         }
       });
     },
@@ -96,7 +95,7 @@ export default {
       });
       if (inValidIndividuals.length === 0) {
         this.$store.dispatch("individuals/saveAll", {
-          companyId: this.$props.companyId
+          companyId: this.$props.company.id
         });
       }
       this.getCompany.childCompanies.forEach(cc => {

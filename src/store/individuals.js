@@ -8,13 +8,8 @@ export default {
   },
 
   getters: {
-    // getCompanies(state) {
-    //   return () => {
-    //     return state.companies;
-    //   };
-    // },
     getIndividualsByCompanyId(state) {
-      return (companyId)=> {
+      return companyId => {
         return _.filter(state.individuals, ind => {
           return ind.companyId === companyId;
         });
@@ -25,8 +20,12 @@ export default {
   mutations: {
     saveIndividuals(state, { individuals }) {
       individuals.forEach(i => {
-        Vue.set(state.individuals, i.id, i);
+        if (i.id) {
+          Vue.set(state.individuals, i.id, i);
+        }
       });
+      JSON.stringify(state.individuals);
+      localStorage.setItem("individuals", JSON.stringify(state.individuals));
     },
 
     deleteIndividual(state, { individual }) {
@@ -34,6 +33,18 @@ export default {
     }
   },
   actions: {
+    init({ commit }) {
+      try {
+        const individuals = Object.values(
+          JSON.parse(localStorage.getItem("individuals"))
+        );
+        if (individuals) {
+          commit("saveIndividuals", { individuals });
+        }
+      } catch (e) {
+        return false;
+      }
+    },
     removeIndividual({ commit }, { individual }) {
       commit("deleteIndividual", { individual });
     },

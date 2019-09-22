@@ -1,6 +1,6 @@
 <template>
   <div class="container" v-if="company">
-    <Entity :companyId="company.id" :ref="company.id" />
+    <Entity :company="company" :ref="company.id" />
     <div>
       <button class="btn btn-primary" v-on:click="save">Save</button>
     </div>
@@ -10,6 +10,7 @@
 <script>
 import { mapGetters } from "vuex";
 import Entity from "../components/Entity";
+import _ from "lodash";
 import uuid from "uuid/v1";
 export default {
   name: "NewCompany",
@@ -32,6 +33,10 @@ export default {
           isParentCompany: true
         }
       });
+    } else {
+      this.company = _.filter(this.getCompanies(), co => {
+        return co.isParentCompany == true;
+      })[0];
     }
   },
   computed: {
@@ -44,10 +49,12 @@ export default {
   },
 
   methods: {
-    loadLocalStore() {},
+    loadLocalStore() {
+      this.$store.dispatch("companies/init");
+      this.$store.dispatch("individuals/init");
+    },
     save() {
-      if (this.$refs[this.company.id].validate()) {
-      }
+      this.$refs[this.company.id].validate();
     }
   }
 };

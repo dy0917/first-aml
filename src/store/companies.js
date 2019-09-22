@@ -22,9 +22,15 @@ export default {
 
   mutations: {
     saveCompanies(state, { companies }) {
-      companies.forEach(i => {
-        Vue.set(state.companies, i.id, i);
-      });
+      if (companies) {
+        companies.forEach(i => {
+          if (i.id) {
+            Vue.set(state.companies, i.id, i);
+          }
+        });
+        //not good practise
+        localStorage.setItem("companies", JSON.stringify(state.companies));
+      }
     },
 
     deleteIndividual(state, { company }) {
@@ -41,6 +47,18 @@ export default {
     }
   },
   actions: {
+    init({ commit }) {
+      try {
+        const companies = Object.values(
+          JSON.parse(localStorage.getItem("companies"))
+        );
+        if (companies) {
+          commit("saveCompanies", { companies });
+        }
+      } catch (e) {
+        return false;
+      }
+    },
     saveAll({ commit }, { companyId }) {
       commit("saveAll", { companyId });
     },
